@@ -1,4 +1,4 @@
-﻿//#pragma warning (disable : 4996)
+//#pragma warning (disable : 4996)
 //#pragma warning (disable : 6031)
 #include <iostream>
 #include <stdio.h>
@@ -8,8 +8,6 @@
 #include <string>
 #include <cstring>
 #include <time.h>
-#include <vector>
-#include <array>
 #include "openai.hpp"
 #include "nlohmann/json.hpp"
 #define _CRT_SECURE_NO_WARNINGS
@@ -20,20 +18,19 @@ const int INF = 987654321;     // INF값 9억.
 
 
 /*
-   [11.24]
+   [05.17]
    1. 그래프(100,300)을 생성 + 간선 중복없이 300개 랜덤생성 + 연결그래프 확인까지 완료
    - 인접행렬 100x100이므로 memory : 40kb
 
-   [11.28]
+   [05.18]
    1. 간선에 랜덤 가중치(1~9)를 줬음. 도시간 거리 distance를 의미.
    2. 플로이드 워셜 알고리즘으로 도시간 이동할 때, 항상 최단거리로 이동하도록 인접행렬을 업데이트 했음.
-   3. RB트리의 기본 함수들을 가져옴
+   3. RB트리의 기본 함수들을 report2에서 그대로 가져왔음.
    4. 호텔RB트리를 만들자. (key : 호텔 가격)
  */
-// (100,300,100) -> (30,100,50)
-#define NODES (30)     // 도시 개수
-#define EDGES (100)     // transportation 개수(항공선 개수)
-#define HOTELS (50)     // 각 도시당 호텔 개수 
+#define NODES (100)     // 도시 개수 : 100개
+#define EDGES (300)     // transportation 개수(항공선 개수) : 300개
+#define HOTELS (100)     // 각 도시당 호텔 개수 : 100개씩 (총 10,000개)
 
 
 
@@ -172,7 +169,6 @@ struct node_t* MaxKeyOfRBtree(struct rbtree* t) {
 struct node_t* tree_successor(struct rbtree* t, struct node_t* n) {
         // right child가 존재할 경우, 우측 노드의 제일 왼쪽을 찾으면 됨
         // right sub tree의 최솟값
-        if (t == NULL) {}
         if (n->right != NULL) {
                 // temp가 NULL이 될때까지 왼쪽으로 이동
                 struct node_t* temp_c = n->right;
@@ -606,12 +602,12 @@ void PRINT_BST(struct node_t* n, struct trunk* prev, bool is_left) {
                 }
                 show_trunks(trunk_temp);
 
-                cout << " " << n->key;
+                printf(" %d", n->key);
                 if (n->color == RED) {
-                    cout << "○\n";
+                        printf("%s\n", "○");
                 }
                 else {
-                    cout << "●\n"; 
+                        printf("%s\n", "●");
                 }
 
                 if (prev) {
@@ -718,9 +714,9 @@ bool isConnectedGraph(int** adjMatrix) {
 void printAdjMatrix(int** adjMatrix) {
         for (int i = 0; i < NODES; i++) {
                 for (int j = 0; j < NODES; j++) {
-                        (adjMatrix[i][j] == INF) ? cout << "- " : cout << adjMatrix[i][j] << " ";
+                        (adjMatrix[i][j] == INF) ? printf("- ") : printf("%d ", adjMatrix[i][j]);
                 }
-                cout << endl;
+                printf("\n");
         }
 }
 
@@ -728,9 +724,9 @@ void printAdjMatrix(int** adjMatrix) {
 void printOriginMatrix(int originMatrix[][NODES]) {
         for (int i = 0; i < NODES; i++) {
                 for (int j = 0; j < NODES; j++) {
-                        (originMatrix[i][j] == INF) ? cout << "- " : cout << originMatrix[i][j] << " ";
+                        (originMatrix[i][j] == INF) ? printf("- ") : printf("%d ", originMatrix[i][j]);
                 }
-                cout << endl;
+                printf("\n");
         }
 }
 
@@ -788,7 +784,12 @@ void Make_Hotel_RBtrees(struct rbtree* HT[NODES]) {
                 }
 
                 // 호텔 RB tree 출력
-                
+                /*
+                   printf("\n\n  Random KEY (호텔)값 100개  :  ");
+                   for (int i = 0; i < HOTELS; i++)        printf(" %d ", A[i]);
+                   printf("\n\n   RB트리 출력!! \n\n");
+                   PRINT_BST(HT[i]->root, NULL, false);
+                 */
 
 
         }
@@ -824,7 +825,7 @@ int Sum_distance_dest_order(int* input_dest, int num_dest, int** adjMatrix) {
 int* make_dest_order(int num_dest, int* input_dest, int start, int** adjMatrix) {
         // ERROR CODE
         if (num_dest <= 0 || num_dest > 100) {
-                cout << "\n\n  ERROR : 목적지의 개수가 잘못되었습니다.\n";
+                printf("\n\n  ERROR : 목적지의 개수가 잘못되었습니다.\n");
                 exit(0);
         }
 
@@ -933,10 +934,10 @@ linkNode* addNode(linkNode** head, int* sorted_dest, int stay, int idx, int num_
 void printLinkedList(linkNode* head) {
         linkNode* temp = head;
         while (temp != NULL) {
-                printf("        - [ %d ]번 도시에서   >   [ %d ]일 숙박\n", temp->cur_city+1, temp->stay);
+                printf("        - [ %d ]번 도시에서   >   [ %d ]일 숙박\n", temp->cur_city, temp->stay);
                 temp = temp->next;
         }
-        cout << endl;
+        printf("\n");
 }
 
 // 예약자 정보 확인 함수
@@ -958,239 +959,70 @@ void Show_reservation(int id) {
         linkNode* head;                 // 도시이동 링크드 정보들
         }reservation_info[1000];
          */
-        cout << "\n\n\n  # 예약자 정보 #\n";
+        printf("\n\n\n  # 예약자 정보 #\n");
         printf("    ▶ 성함 : %s\n", reservation_info[id].my_name);
         printf("    ▶ 출발 날짜 : %d년 %d월 %d일\n", reservation_info[id].year, reservation_info[id].month, reservation_info[id].day);
         printf("    ▶ 여행 기간 : %d일간\n", reservation_info[id].period);
         printf("    ▶ 예산 : %d (KRW)\n", reservation_info[id].budget);
         printf("    ▶ 비용 : %d (KRW)\n", reservation_info[id].total_price);
-        if (reservation_info[id].fly_ver == 1)                  cout << "    ▶ 항공 옵션  :  ★ [Economy] 등급\n";
-        else if (reservation_info[id].fly_ver == 2)             cout << "    ▶ 항공 옵션  :  ★★ [Business] 등급\n";
-        else                                                                                    cout <<"    ▶ 항공 옵션  :  ★★★ [First] 등급\n";
-        if (reservation_info[id].hotel_ver == 1)                                cout << "    ▶ 호텔 옵션  :  ★ [Cheapest] 호텔\n";
-        else if (reservation_info[id].hotel_ver == 2)                   cout << "    ▶ 호텔 옵션  :  ★★ [Resonable] 호텔\n";
-        else                                                                                                    cout << "    ▶ 호텔 옵션  :  ★★★ [Flex] 호텔\n";
-        cout << "\n\n\n ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ[AI예약 결과판]ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";
-        cout << "\n\n  (1) 최소비용 항공 이동 경로 : ";
+        if (reservation_info[id].fly_ver == 1)                  printf("    ▶ 항공 옵션  :  ★ [Economy] 등급\n");
+        else if (reservation_info[id].fly_ver == 2)             printf("    ▶ 항공 옵션  :  ★★ [Business] 등급\n");
+        else                                                                                    printf("    ▶ 항공 옵션  :  ★★★ [First] 등급\n");
+        if (reservation_info[id].hotel_ver == 1)                                printf("    ▶ 호텔 옵션  :  ★ [Cheapest] 호텔\n");
+        else if (reservation_info[id].hotel_ver == 2)                   printf("    ▶ 호텔 옵션  :  ★★ [Resonable] 호텔\n");
+        else                                                                                                    printf("    ▶ 호텔 옵션  :  ★★★ [Flex] 호텔\n");
+        printf("\n\n\n ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ[AI예약 결과판]ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n");
+        printf("\n\n  (1) 최소비용 항공 이동 경로 : ");
         linkNode* head = reservation_info[id].head;
         linkNode* temp = head;
         for (temp = head; temp != NULL; temp = temp->next)
-                printf(" [%d]도시 -> ", temp->cur_city+1);
+                printf(" [%d]도시 -> ", temp->cur_city);
         printf(" [%d]도시\n\n", head->cur_city);
         printf("        - 총 이동거리 : [ %d ] km\n\n\n\n", reservation_info[id].total_distance);
 
 
         // 항공권 예약 정보 출력
-        cout << "  (2) [항공권 예약 정보]는 아래와 같습니다.\n\n";
-        if (reservation_info[id].fly_ver == 1)                  cout << "        ★ [Economy]등급으로 예약완료.\n";
-        else if (reservation_info[id].fly_ver == 2)             cout << "        ★★ [Business]등급으로 예약완료.\n";
-        else                                                                                    cout << "        ★★★ [First]등급으로 예약완료.\n";
+        printf("  (2) [항공권 예약 정보]는 아래와 같습니다.\n\n");
+        if (reservation_info[id].fly_ver == 1)                  printf("        ★ [Economy]등급으로 예약완료.\n");
+        else if (reservation_info[id].fly_ver == 2)             printf("        ★★ [Business]등급으로 예약완료.\n");
+        else                                                                                    printf("        ★★★ [First]등급으로 예약완료.\n");
 
-        cout << "\n            [출발지]           [도착지]                [가격]\n";
-        cout << "     ========================================================================\n";
+        printf("\n            [출발지]           [도착지]                [가격]\n");
+        printf("     ========================================================================\n");
 
         for (temp = head; temp != NULL; temp = temp->next) {
-                printf("          [ %d ]번 도시   →   [ %d ]번 도시        [ %d ] KRW(원)\n", temp->cur_city+1, temp->next_city+1, temp->flight_cost);
+                printf("          [ %d ]번 도시   →   [ %d ]번 도시        [ %d ] KRW(원)\n", temp->cur_city, temp->next_city, temp->flight_cost);
         }
-        cout << "     ========================================================================\n";
+        printf("     ========================================================================\n");
 
 
         // 링크드 리스트 출력
-        cout << "\n  (3) 도시별 [날짜 분배]는 아래와 같습니다. \n\n";
+        printf("\n  (3) 도시별 [날짜 분배]는 아래와 같습니다. \n\n");
         printLinkedList(head);
 
 
         // 호텔 예약 출력
-        cout << "\n\n  (4) [호텔 예약 정보]는 아래와 같이 진행했습니다.\n\n";
-        if (reservation_info[id].hotel_ver == 1)                                cout << "        ★ [Cheapest] 방식으로 호텔 예약 완료\n";
-        else if (reservation_info[id].hotel_ver == 2)                   cout << "        ★★ [Resonable] 방식으로 호텔 예약 완료\n";
-        else                                                                                                    cout << "        ★★★ [Flex] 방식으로 호텔 예약 완료\n";
-        cout << "\n            [일차]        [도시번호]               [호텔가격]\n";
-        cout << "     ================================================================================\n";
+        printf("\n\n  (4) [호텔 예약 정보]는 아래와 같이 진행했습니다.\n\n");
+        if (reservation_info[id].hotel_ver == 1)                                printf("        ★ [Cheapest] 방식으로 호텔 예약 완료\n");
+        else if (reservation_info[id].hotel_ver == 2)                   printf("        ★★ [Resonable] 방식으로 호텔 예약 완료\n");
+        else                                                                                                    printf("        ★★★ [Flex] 방식으로 호텔 예약 완료\n");
+        printf("\n            [일차]        [도시번호]               [호텔가격]\n");
+        printf("     ================================================================================\n");
         int hot_cnt = 1;
         for (temp = head; temp != NULL; temp = temp->next) {            // 방문할 도시 돌면서
                 for (int i = 0; i < temp->stay; i++) {                                          // 묵을 날 수 돌면서
-                        printf("         - %d일차  :  [ %d ]번도시 Hotel      [ %d ] KRW(원) 에 예약완료.\n", hot_cnt, temp->cur_city+1, temp->hotel[i]);
+                        printf("         - %d일차  :  [ %d ]번도시 Hotel      [ %d ] KRW(원) 에 예약완료.\n", hot_cnt, temp->cur_city, temp->hotel[i]);
                         hot_cnt++;
                 }
-                cout << "\n\n";
+                printf("\n\n");
         }
-        cout << "     ================================================================================\n";
+        printf("     ================================================================================\n");
 }
 
-class CityStorage {
-protected:
-    static const int N = NODES; 
-    array<string, N> cityArray;
-    int totalCities;
-
-public:
-    // 생성자: extractedCities를 받아서 cityArray에 저장하고 totalCities 초기화
-    CityStorage(const vector<string>& extractedCities) {
-        totalCities = extractedCities.size();
-        for (int i = 0; i < totalCities; i++) {
-            cityArray[i] = extractedCities[i];
-        }
-    }
-
-    // 도시 개수 반환
-    int getTotalCities() const {
-        return totalCities;
-    }
-
-    // cityArray의 특정 인덱스에 있는 도시 이름 반환
-    string getCityName(int index) const {
-        if (index >= 0 && index < totalCities) {
-            return cityArray[index];
-        }
-        return "Invalid Index";
-    }
-
-    // 하위 클래스에서 구현할 가상 메서드
-    virtual void explain(int index) {
-        cout << index << "City data not implemented for the base class." << endl;
-    }
-};
-
-class CityExplainWithText : public CityStorage {
-public:
-    CityExplainWithText(const vector<string>& extractedCities) : CityStorage(extractedCities) {}
-
-    // CityStorage 클래스의 가상 메서드를 오버라이드하여 새로운 기능 추가
-    void explain(int index) override {
-        string cur_city = cityArray[index];
-        string previousUserContent = "hello";
-        string previousGPTResponse = "hello! How can I help you?";
-        string userContent = "Why is " + cur_city + " a great place to travel? Can you recommend some places worth visiting in " + cur_city;
-        cout << "\n  Q : " + userContent + "\n    AI responsing..";
-
-        using json = nlohmann::json;
-        openai::start();
-
-        // 이전 대화와 현재 대화를 결합하여 JSON 객체 생성
-        json messages = json::array();
-        messages.push_back({ {"role", "user"}, {"content", previousUserContent} });
-        messages.push_back({ {"role", "assistant"}, {"content", previousGPTResponse} });
-        messages.push_back({ {"role", "user"}, {"content", userContent} });
-
-        json jsonRequest = {
-                {"model", "gpt-3.5-turbo"},
-                {"messages", messages},
-                {"max_tokens", 300},
-                {"temperature", 0}
-        };
-
-        // Chat API 호출
-        auto chat = openai::chat().create(jsonRequest);
-
-        // GPT 응답 저장
-        string GPTResponse = chat["choices"][0]["message"]["content"].get<string>();
-
-        // 응답 출력
-        cout << "\n\n  GPT : " << GPTResponse << '\n';
-    }
-};
-
-class CityExplainWithPhoto : public CityStorage {
-public:
-    CityExplainWithPhoto(const vector<string>& extractedCities) : CityStorage(extractedCities) {}
-
-    // CityStorage 클래스의 가상 메서드를 오버라이드하여 새로운 기능 추가
-    void explain(int index) override {
-        string cur_city = cityArray[index];
-        string userContent = cur_city + "'s best travel spot";
-        cout << "\n\n  Q : Please show " << userContent << '\n' << "    AI responsing..";
-        openai::start(); 
-        auto completion = openai::completion().create(R"(
-            {
-                "model": "text-davinci-003",
-                "prompt": "Say this is a test",
-                "max_tokens": 7,
-                "temperature": 0
-            }
-        )"_json); // Using user-defined (raw) string literals
-        cout << "\n\n  GPT: \n";
-
-        auto image = openai::image().create({
-            { "prompt", userContent},
-            { "n", 1 },
-            { "size", "512x512" }
-            }); // Using initializer lists
-        cout << "\n  Image URL is: " << image["data"][0]["url"] << '\n';
-    }
-};
 
 int main() {
         //--------------------------------------------------------------------------------------------------------//
-        //--------------------------[0단계] GPT에게 도시 이름 받기 -------------------------------------------------//
-        //--------------------------------------------------------------------------------------------------------//
-        cout << "\n\n  AI 여행 자동 예약 시스템에 오신 것을 환영합니다. \n\n";
-        cout << "  시작할까요? (y) : ";
-        string tmp;     cin >> tmp;
-       
-        cout << "\n  GPT : hello! How can I help you?\n\n";
-        for (int i = 0; i < INF/2; i++) {}
-        cout << "  Q : Please recommend " + to_string(NODES) + " city names worth for travel.\n\n";
-        cout << "\n  GPT : OK. Please wait...\n";
-
-        using json = nlohmann::json;
-        openai::start();
-
-        string previousUserContent = "hello";
-        string previousGPTResponse = "hello! How can I help you?";
-        string userContent = "Write " + to_string(NODES) + " city names worth for travel.you must provide only city names with \"#\" around  of city name. No other words except city names because I'll parse your response.";
-        
-
-        // 이전 대화와 현재 대화를 결합하여 JSON 객체 생성
-        json messages = json::array();
-        messages.push_back({ {"role", "user"}, {"content", previousUserContent} });
-        messages.push_back({ {"role", "assistant"}, {"content", previousGPTResponse} });
-        messages.push_back({ {"role", "user"}, {"content", userContent} });
-
-        json jsonRequest = {
-                {"model", "gpt-3.5-turbo"},
-                {"messages", messages},
-                {"max_tokens", 1000},
-                {"temperature", 0}
-        };
-
-        // Chat API 호출
-        auto chat = openai::chat().create(jsonRequest);
-
-        // GPT 응답 저장
-        string GPTResponse = chat["choices"][0]["message"]["content"].get<string>();
-
-        // 응답 출력
-        cout << "\n  GPT : " << GPTResponse << '\n';
-        cout << "\n  GPT가 추천해준 도시들로 시작하겠습니다! \n";
-
-        // 파싱
-        vector<string> extractedCities;
-        size_t startPos = 0;
-        size_t endPos = 0;
-
-        while ((startPos = GPTResponse.find("#", endPos)) != string::npos) {
-            endPos = GPTResponse.find("#", startPos + 1);
-            if (endPos != string::npos) {
-                string cur_city = GPTResponse.substr(startPos + 1, endPos - startPos - 1);
-                if (cur_city == " ")    continue;
-                extractedCities.push_back(cur_city);
-            }
-        }
-
-        // GPT 클래스 트리오 인스턴스화
-        CityStorage cityStorage(extractedCities);
-        CityExplainWithText cityWithText(extractedCities);
-        CityExplainWithPhoto cityWithPhoto(extractedCities);
-
-        // 여행도시 출력
-        for (int i = 0; i < cityStorage.getTotalCities(); i++) {
-            cout << "    " << i + 1 << ". " << cityStorage.getCityName(i) << '\n';
-        }
-        
-
-        //--------------------------------------------------------------------------------------------------------//
-        //--------------------------[1단계] 도시(30,100)그래프 생성하기 -------------------------------------------//
+        //--------------------------[1단계] 도시(100,300)그래프 생성하기 -------------------------------------------//
         //--------------------------------------------------------------------------------------------------------//
         srand(time(NULL));  // 난수 발생기 초기화
 
@@ -1266,49 +1098,13 @@ int main() {
 
         // UI 시작!!
         while (true) {
-                cout << "\n\n\n\n\n\n =====================================================================================================================\n";
+                cout << "\n\n\n\n\n\n\n\n =====================================================================================================================\n";
                 cout << "  여행(AI travel) 자동 예약 시스템 [홈]입니다. 옵션을 선택해주세요.\n\n  (1.새로운 예약  /  2.예약 삭제  /  3.예약정보확인  /  " 
-                        << "4.예약자번호보기  /  5.호텔정보  /  6.항공권정보  /  7.AI 챗봇 서비스  /  8.여행지 AI정보  /  9.종료) \n\n      - 선택(번호)? : ";
-                cin >> cmd;
-                if (cmd == 9) {
-                        cout << "\n\n  9. 종료를 선택하셨습니다.\n";
+                        << "4.예약자번호보기  /  5.호텔정보  /  6.항공권정보  /  7.AI 챗봇 서비스  /  8.종료) \n\n      - 선택(번호)? : ";
+                scanf("%d", &cmd);
+                if (cmd == 8) {
+                        printf("\n\n  8. 종료를 선택하셨습니다.\n");
                         break;
-                }
-                else if (cmd == 8) {
-                    while (true) {
-                        cout << "\n\n  8. [여행지 AI정보]를 시작하겠습니다.  어느 여행지에 대해 궁금하신가요?\n";
-                        cout << "    " << "0. 나가기" << '\n';
-                        for (int i = 0; i < cityStorage.getTotalCities(); i++) {
-                            cout << "    " << i + 1 << ". " << cityStorage.getCityName(i) << '\n';
-                        }
-                        
-                        cout << "\n      번호 선택 : ";
-                        int info_num;   cin >> info_num;
-                        info_num--;
-                        if (info_num == -1) {
-                            cout << "\n\n  8-0. [홈]으로 돌아갑니다.\n";
-                            break;
-                        }
-                        if (info_num < 0 || info_num >= NODES) {
-                            cout << "  없는 여행지를 선택하셨습니다. \n";
-                            break;
-                        }
-                        // info_num번째 도시 정보 얻기
-                        
-                        cityWithText.explain(info_num);
-
-                        cout << "\n  추가 결제를 하시면 여행지 사진도 보여드립니다.\n  보시겠습니까? (y/n) : ";
-                        char tmp[10];  cin >> tmp;
-                        if (tmp[0] == 'y') {
-                            cout << "\n  결제해 주셔서 감사합니다. 여행지 이미지를 생성하겠습니다.\n";
-                            cityWithPhoto.explain(info_num);
-                        }
-
-                        cout << "\n  아무 키를 입력하세요.\n  아무 키 : ";
-                        cin >> tmp;
-                        continue;
-                    }
-
                 }
                 else if (cmd == 7) {
                         cout << "\n\n  7. [여행 추천 AI 챗봇 서비스]를 시작하겠습니다.\n  영어로 자유롭게 질문해주세요. 종료를 원하시면 [exit] 을 입력해주세요.\n\n";
@@ -1317,14 +1113,9 @@ int main() {
 
                         string previousUserContent = "hello";
                         string previousGPTResponse = "hello! How can I help you?";
-                        bool first_flag = false;
 
                         while (true) {
-                                if (first_flag) {
-                                        cout << "Q : ";
-                                }
-                                first_flag = true;
-
+                                cout << "Q : ";
                                 string userContent;
                                 //cin.ignore();
                                 getline(cin, userContent);
@@ -1355,138 +1146,108 @@ int main() {
 
                                 // 응답 출력
                                 cout << "GPT : " << previousGPTResponse << '\n';
-                                
                         }
                 }
                 else if (cmd == 6) {
                         while (true) {
-                                cout << "\n\n  6. [항공권 정보]를 알려드리겠습니다.\n\n  (1.도시별 직항 가격  /  2.경유포함 최저가  /  3.나가기\n  선택(번호)? : ";
-                                cin >> cmd2;
+                                printf("\n\n  6. [항공권 정보]를 알려드리겠습니다.\n\n  (1.도시별 직항 가격  /  2.경유포함 최저가  /  3.나가기\n  선택(번호)? : ");
+                                scanf("%d", &cmd2);
                                 if (cmd2 == 1) {
-                                        cout << "\n\n  6 - 1. 도시별 직항 가격을 공지해드리겠습니다.(2차원 array 형태, -: 직항X)\n\n";
-                                        for (int i = 0; i < cityStorage.getTotalCities(); i++) {
-                                            cout << "    " << i + 1 << ". " << cityStorage.getCityName(i) << '\n';
-                                        }
+                                        printf("\n\n  6-1. 도시별 직항 가격을 공지해드리겠습니다.(2차원 array 형태, - : 직항X)\n\n");
                                         printOriginMatrix(originMatrix);
-                                        cout << "\n  아무 키를 입력하세요.\n  아무 키 : ";
-                                        string tmp;  cin >> tmp;
-                                        continue;
                                 }
                                 else if (cmd2 == 2) {
-                                        cout << "\n\n  6-1. 경유포함 최저 가격을 공지해드리겠습니다.(2차원 array 형태)\n\n";
-                                        for (int i = 0; i < cityStorage.getTotalCities(); i++) {
-                                            cout << "    " << i + 1 << ". " << cityStorage.getCityName(i) << '\n';
-                                        }
+                                        printf("\n\n  6-1. 경유포함 최저 가격을 공지해드리겠습니다.(2차원 array 형태)\n\n");
                                         printAdjMatrix(adjMatrix);
-                                        cout << "\n  아무 키를 입력하세요.\n  아무 키 : ";
-                                        string tmp;  cin >> tmp;
-                                        continue;
                                 }
                                 else if (cmd2 == 3) {
-                                        cout << "\n\n  6-3. [홈]으로 돌아갑니다.\n";
+                                        printf("\n\n  6-3. [홈]으로 돌아갑니다.\n");
                                         break;
                                 }
                                 else {
-                                        cout << "\n\n  6-3. 선택번호 오류. 다시 선택해주세요.\n\n";
+                                        printf("\n\n  6-3. 선택번호 오류. 다시 선택해주세요.\n\n");
                                 }
                         }
 
                 }
                 else if (cmd == 5) {
                         while (true) {
-                                cout << "\n\n  5. [호텔 정보]를 알려드리겠습니다.\n\n  (1.특정도시 호텔가격  /  2.모든도시 호텔가격  /  3.나가기\n  선택(번호)? : ";
-                                cin >> cmd2;
+                                printf("\n\n  5. [호텔 정보]를 알려드리겠습니다.\n\n  (1.특정도시 호텔가격  /  2.모든도시 호텔가격  /  3.나가기\n  선택(번호)? : ");
+                                scanf("%d", &cmd2);
                                 if (cmd2 == 1) {
-                                        for (int i = 0; i < cityStorage.getTotalCities(); i++) {
-                                            cout << "    " << i + 1 << ". " << cityStorage.getCityName(i) << '\n';
-                                        }
                                         int hot_tmp;
-                                        cout << "\n\n  5-1. 특정도시의 호텔가격을 공지해드리겠습니다.\n  도시번호? : ";
-                                        cin >> hot_tmp;
-                                        hot_tmp--;
-                                        printf("\n\n\n\n  %d. [ %s ]의 예약 가능한 호텔은 [ %d ]개 남아있습니다.\n  가격은 아래와 같습니다.\n", hot_tmp+1, cityStorage.getCityName(hot_tmp).c_str(), avail_room[hot_tmp]);
-                                        cout << "  출력 색 구분  --->   RED : ○          BLACK : ●\n";
-                                        printf("\n  %d. [ %s ]의 호텔 가격 정보입니다. \n", hot_tmp+1, cityStorage.getCityName(hot_tmp).c_str());
+                                        printf("\n\n  5-1. 특정도시의 호텔가격을 공지해드리겠습니다.\n  도시번호? : ");
+                                        scanf("%d", &hot_tmp);
+                                        printf("\n\n\n\n  %d번 도시의 예약 가능한 호텔은 [ %d ]개 남아있습니다.\n  가격은 아래와 같습니다.\n", hot_tmp, avail_room[hot_tmp]);
+                                        printf("  출력 색 구분  --->   RED : ○          BLACK : ●\n");
+                                        printf("\n  %d번 도시의 호텔 가격 정보입니다. \n", hot_tmp);
                                         PRINT_BST(HT[hot_tmp]->root, NULL, false);
-
-                                        cout << "\n  아무 키를 입력하세요.\n  아무 키 : ";
-                                        string tmp;  cin >> tmp;
-                                        continue;
                                 }
                                 else if (cmd2 == 2) {
-                                        cout << "\n\n  5-2. 모든도시의 호텔가격을 공지해드리겠습니다.\n";
+                                        printf("\n\n  5-2. 모든도시의 호텔가격을 공지해드리겠습니다.\n");
                                         for (int i = 0; i < NODES; i++) {
-                                                printf("\n\n   %d. [ %s ]는 [ %d ]개의 호텔이 남아있습니다.\n", i+1, cityStorage.getCityName(i).c_str(), avail_room[i]);
+                                                printf("\n\n   %d번 도시는 [ %d ]개의 호텔이 남아있습니다.\n", i, avail_room[i]);
                                                 PRINT_BST(HT[i]->root, NULL, false);
                                         }
-                                        cout << "  출력 색 구분  --->   RED : ○          BLACK : ●\n";
-                                        cout << "\n  아무 키를 입력하세요.\n  아무 키 : ";
-                                        string tmp;  cin >> tmp;
-                                        continue;
+                                        printf("  출력 색 구분  --->   RED : ○          BLACK : ●\n");
                                 }
                                 else if (cmd2 == 3) {
-                                        cout << "\n\n  5-3. [홈]으로 돌아갑니다.\n";
+                                        printf("\n\n  5-3. [홈]으로 돌아갑니다.\n");
                                         break;
                                 }
                                 else {
-                                        cout << "\n\n  5-3. 선택번호 오류. 다시 선택해주세요.\n\n";
+                                        printf("\n\n  5-3. 선택번호 오류. 다시 선택해주세요.\n\n");
                                 }
                         }
                 }
                 else if (cmd == 4) {
-                        cout << "\n\n  4. [예약자 현황](고유번호)을 보여드리겠습니다.\n";
-                        cout << "  출력 색 구분  --->   RED : ○          BLACK : ●\n";
+                        printf("\n\n  4. [예약자 현황](고유번호)을 보여드리겠습니다.\n");
+                        printf("  출력 색 구분  --->   RED : ○          BLACK : ●\n");
                         // 예약자 RB트리 출력해주기
                         PRINT_BST(BOOKT->root, NULL, false);
                         printf("\n  위와 같이 총 [ %d ]명이 예약해 주셨습니다.\n\n  아무 숫자를 입력하면 [홈]으로 돌아갑니다.\n  숫자 : ", booked_num);
-                        int tmp;  cin >> tmp;
+                        int tmp;  scanf("%d", &tmp);
                 }
                 else if (cmd == 3) {
-                        cout << "\n\n  3. [예약하신 정보를 확인]해드리겠습니다.\n\n  예약자 고유번호를 입력해주세요.\n\n  customer-id : ";
-                        cin >> id;
+                        printf("\n\n  3. [예약하신 정보를 확인]해드리겠습니다.\n\n  예약자 고유번호를 입력해주세요.\n\n  customer-id : ");
+                        scanf("%d", &id);
 
                         // 예약자 RB트리에서 찾아보고, 존재하면 정보 출력.
                         if (rbtree_find(BOOKT, id) == NULL) {
                                 printf("\n\n  [고유번호 오류] 입력하신 예약자 고유번호( %d ) 정보가 존재하지 않습니다.\n  예약자 고유번호를 다시 확인해주세요.\n\n", id);
-                                cout << "  아무 키를 입력하면[홈]으로 돌아갑니다.\n  아무 키 : ";
-                                char tmp[10];  cin >> tmp;
+                                printf("  아무 키를 입력하면[홈]으로 돌아갑니다.\n  아무 키 : ");
+                                char tmp[10];  scanf("%s", tmp);
                                 continue;
                         }
 
                         // id가 존재하므로 struct에서 정보 보고 출력
-                        for (int i = 0; i < cityStorage.getTotalCities(); i++) {
-                            cout << "    " << i + 1 << ". " << cityStorage.getCityName(i) << '\n';
-                        }
                         Show_reservation(id);
                 }
                 else if (cmd == 2) {
-                        cout << "\n\n  2. [예약 삭제]를 진행하겠습니다.\n\n  삭제하실 예약자 고유번호를 입력해주세요.\n\n  customer-id : ";
-                        cin >> id;
+                        printf("\n\n  2. [예약 삭제]를 진행하겠습니다.\n\n  삭제하실 예약자 고유번호를 입력해주세요.\n\n  customer-id : ");
+                        scanf("%d", &id);
 
                         // 예약자 RB트리에서 찾아보고, 삭제진행(예약된 호텔도 전부 다시 복구)
                         if (rbtree_find(BOOKT, id) == NULL) {
                                 printf("\n\n  [고유번호 오류] 입력하신 예약자 고유번호( %d ) 정보가 존재하지 않습니다.\n  예약자 고유번호를 다시 확인해주세요.\n\n", id);
-                                cout << "  아무 키를 입력하면[홈]으로 돌아갑니다.\n  아무 키 : ";
-                                char tmp[10];  cin >> tmp;
+                                printf("  아무 키를 입력하면[홈]으로 돌아갑니다.\n  아무 키 : ");
+                                char tmp[10];  scanf("%s", tmp);
                                 continue;
                         }
 
                         // 예약 정보 일단 보여주기
-                        for (int i = 0; i < cityStorage.getTotalCities(); i++) {
-                            cout << "    " << i + 1 << ". " << cityStorage.getCityName(i) << '\n';
-                        }
                         Show_reservation(id);
-                        cout << "\n\n  ㄴ 위와 같이 예약정보가 존재합니다. 정말로 삭제하시겠습니까?(y/n)\n";
-                        cout << "  입력?(y/n) : ";
-                        char yn[10];    cin >> yn;
+                        printf("\n\n  ㄴ 위와 같이 예약정보가 존재합니다. 정말로 삭제하시겠습니까?(y/n)\n");
+                        printf("  입력?(y/n) : ");
+                        char yn[10];    scanf("%s", yn);
                         if (yn[0] == 'n' || yn[0] == 'N') {
-                                cout << "\n\n  삭제하지 않습니다. 아무키를 누르시면 [홈]으로 돌아갑니다.\n  아무 키 : ";
-                                char tmp[10];   cin >> tmp;
+                                printf("\n\n  삭제하지 않습니다. 아무키를 누르시면 [홈]으로 돌아갑니다.\n  아무 키 : ");
+                                char tmp[10];   scanf("%s", tmp);
                                 continue;
                         }
 
 
-                        cout << "\n\n  삭제를 진행하겠습니다.....\n";
+                        printf("\n\n  삭제를 진행하겠습니다.....\n");
                         // id 예약자 존재하므로 취소 진행.
                         // 호텔 취소 진행.
                         linkNode* head = reservation_info[id].head;
@@ -1530,37 +1291,29 @@ int main() {
                         int total_price = 0;            // 총 비용
 
                         while (true) {
-                                cout << "\n\n\n  1. 환영합니다. [새로운 예약]을 시작하겠습니다.\n";
+                                printf("\n\n\n  1. 환영합니다. [새로운 예약]을 시작하겠습니다.\n");
 
-                                cout << "\n  '예산'을 입력하세요.\n      - 예산(만원) : ";
-                                cin >> budget;
-                                budget *= 10000;
+                                printf("\n  '예산'을 입력하세요.\n      - 예산(만원) : ");
+                                scanf("%d", &budget);
 
-                                cout << "\n  '목적지의 개수'를 먼저 입력하세요. (<=100)\n      - 목적지 개수 : ";
-                                cin >> num_dest;
+                                printf("\n  '목적지의 개수'를 먼저 입력하세요. (<=100)\n      - 목적지 개수 : ");
+                                scanf("%d", &num_dest);
                                 if (num_dest > 100 || num_dest < 1) {
                                         printf("\n  [오류] : 목적지 개수가 잘못되었습니다. (1개~100개로 입력해야함)\n");
                                         exit(0);
                                 }
-                                // 도시 이름 출력
-                                for (int i = 0; i < cityStorage.getTotalCities(); i++) {
-                                    cout << "    " << i + 1 << ". " << cityStorage.getCityName(i) << '\n';
-                                }
-                                cout << "\n\n  '목적지들'(도시번호)을 입력해주세요. (도시번호 1~50번)\n      - 목적지들(번호) : ";
+                                printf("\n\n  '목적지들'(도시번호)을 입력해주세요. (도시번호 0~99번)\n      - 목적지들(번호) : ");
                                 for (int i = 0; i < num_dest; i++) {
-                                        int dst_tmp;
-                                        cin >> dst_tmp;
-                                        input_dest[i] = dst_tmp - 1;
-                                        if (input_dest[i] < 0 || input_dest[i] >= NODES) {
-                                                cout << "\n  [오류] : 도시번호가 잘못되었습니다. 다시 입력해주세요. (1~50번으로 입력해야함)\n";
+                                        scanf("%d", &input_dest[i]);
+                                        if (input_dest[i] < 0 || input_dest[i] > 99) {
+                                                printf("\n  [오류] : 도시번호가 잘못되었습니다. 다시 입력해주세요. (0~99번으로 입력해야함)\n");
                                                 exit(0);
                                         }
                                 }
-                                cout << "\n\n  목적지들 중 '시작 도시'를 입력해주세요.\n      - 시작도시(번호) : ";
-                                int st_tmp;  cin >> st_tmp;
-                                start = st_tmp - 1;
-                                if (start < 0 || start >= NODES) {
-                                        cout << "\n[오류] : 시작도시번호가 잘못되었습니다. (1~50번으로 입력해야함)\n";
+                                printf("\n\n  목적지들 중 '시작 도시'를 입력해주세요.\n      - 시작도시(번호) : ");
+                                scanf("%d", &start);
+                                if (start < 0 || start > 99) {
+                                        printf("\n  [오류] : 시작도시번호가 잘못되었습니다. (0~99번으로 입력해야함)\n");
                                         exit(0);
                                 }
                                 // 입력한 목적지중에 시작점이 없으면 오류
@@ -1570,14 +1323,10 @@ int main() {
                                                 start_flag = true;
                                 }
                                 if (!start_flag) {
-                                        cout << "\n  [오류] : 시작도시가 목적지들중에 존재하지 않습니다.\n";
+                                        printf("\n  [오류] : 시작도시가 목적지들중에 존재하지 않습니다.\n");
                                         exit(0);
                                 }
-                                cout << "\n  여행할 도시 : ";
-                                for (int i = 0; i < num_dest; i++) {
-                                    cout << '[' << cityStorage.getCityName(input_dest[i]) << ']' << ", ";
-                                }
-                                cout << "\n  여행 시작점 : " << '[' << cityStorage.getCityName(start) << ']' << " 입니다.\n";
+
                                 // input_dest의 0번째 도시가 시작도시가 되도록 세팅
                                 for (int i = 0; i < num_dest; i++) {
                                         if (input_dest[i] == start) {
@@ -1589,43 +1338,43 @@ int main() {
 
 
 
-                                cout << "\n\n  여행 기간을 입력하세요.\n      - 여행 기간(일) : ";
-                                cin >> period;
+                                printf("\n\n  여행 기간을 입력하세요.\n      - 여행 기간(일) : ");
+                                scanf("%d", &period);
 
                                 // 항공권, 호텔 가격 옵션 설정
                                 while (true) {
-                                        cout << "\n\n  항공권 옵션을 설정하겠습니다. [항공권]은 어떻게 진행할까요? (1.Economy,  2.Business,  3.First)\n        - 입력 숫자(옵션번호) : ";
-                                        cin >> fly_ver;
+                                        printf("\n\n  항공권 옵션을 설정하겠습니다. [항공권]은 어떻게 진행할까요? (1.Economy,  2.Business,  3.First)\n        - 입력 숫자(옵션번호) : ");
+                                        scanf("%d", &fly_ver);
                                         if (fly_ver == 1 || fly_ver == 2 || fly_ver == 3)       break;
-                                        else                                                                                            cout << "          [항공권 옵션 오류] : 숫자를 잘못 입력하셨습니다. 1,2,3번중에서 다시 입력해주세요.\n";
+                                        else                                                                                            printf("          [항공권 옵션 오류] : 숫자를 잘못 입력하셨습니다. 1,2,3번중에서 다시 입력해주세요.\n");
                                 }
                                 while (true) {
-                                        cout << "\n\n  다음으로 호텔 옵션을 설정하겠습니다. [호텔]은 어떻게 진행할까요? (1.Cheapest,  2.Reasonable,  3.Flex)\n        - 입력 숫자(옵션번호) : ";
-                                        cin >> hotel_ver;
+                                        printf("\n\n  다음으로 호텔 옵션을 설정하겠습니다. [호텔]은 어떻게 진행할까요? (1.Cheapest,  2.Reasonable,  3.Flex)\n        - 입력 숫자(옵션번호) : ");
+                                        scanf("%d", &hotel_ver);
                                         if (hotel_ver == 1 || hotel_ver == 2 || hotel_ver == 3) break;
-                                        else                                                                                            cout << "          [호텔 옵션 오류] : 숫자를 잘못 입력하셨습니다. 1,2,3번중에서 다시 입력해주세요.\n";
+                                        else                                                                                            printf("          [호텔 옵션 오류] : 숫자를 잘못 입력하셨습니다. 1,2,3번중에서 다시 입력해주세요.\n");
                                 }
 
                                 // 출발 날짜 입력
-                                cout << "\n\n  [출발 날짜]를 알려주세요.  - 년도(year) : ";
-                                cin >> year;
-                                cout << "                            -  월(month) : ";
-                                cin >> month;
-                                cout << "                            -  일(day) : ";
-                                cin >> day;
+                                printf("\n\n  [출발 날짜]를 알려주세요.  - 년도(year) : ");
+                                scanf("%d", &year);
+                                printf("                            -  월(month) : ");
+                                scanf("%d", &month);
+                                printf("                            -  일(day) : ");
+                                scanf("%d", &day);
 
                                 // 여행자 이름 받기
-                                cout << "\n\n  마지막으로 [여행자 이름]을 입력해주세요.\n        - 여행자 이름(영문으로) : ";
-                                cin >> my_name;
+                                printf("\n\n  마지막으로 [여행자 이름]을 입력해주세요.\n        - 여행자 이름(영문으로) : ");
+                                scanf("%s", my_name);
 
 
-                                cout << "\n\n\n  소중한 정보들을 입력해주셔서 감사합니다. 입력하신 정보들로 자동 예약을 진행할까요? (y/n)\n  입력(y/n) : ";
+                                printf("\n\n\n  소중한 정보들을 입력해주셔서 감사합니다. 입력하신 정보들로 자동 예약을 진행할까요? (y/n)\n  입력(y/n) : ");
                                 char yn[10];
-                                cin >> yn;
+                                scanf("%s", yn);
                                 if (yn[0] == 'y' || yn[0] == 'Y')
                                         break;
                                 else
-                                        cout << "  다시 예약하기를 선택하셨습니다. 예약 처음으로 돌아갑니다.\n\n";
+                                        printf("  다시 예약하기를 선택하셨습니다. 예약 처음으로 돌아갑니다.\n\n");
                         }       // input받기 끝
 
                         // 3-2. 목적지 경로(방문순서)짜기
@@ -1633,11 +1382,11 @@ int main() {
                         int total_distance = Sum_distance_dest_order(sorted_dest, num_dest, adjMatrix);
 
                         // 경로 출력해보기
-                        cout << "\n\n\n ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ[AI예약 결과판]ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";
-                        cout << "\n\n  (1) 최소비용 항공 이동 경로 : ";
+                        printf("\n\n\n ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ[AI예약 결과판]ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n");
+                        printf("\n\n  (1) 최소비용 항공 이동 경로 : ");
                         for (int i = 0; i < num_dest; i++)
-                                printf(" [%d. %s]도시 -> ", sorted_dest[i]+1, cityStorage.getCityName(sorted_dest[i]).c_str());
-                        printf(" [%d. %s]도시\n\n", start+1, cityStorage.getCityName(start).c_str());
+                                printf(" [%d]도시 -> ", sorted_dest[i]);
+                        printf(" [%d]도시\n\n", start);
                         printf("        - 총 이동거리 : [ %d ] km\n\n\n\n", total_distance);
 
 
@@ -1646,21 +1395,21 @@ int main() {
                         linkNode* temp = ct_head;
 
                         // 노드 추가 & 항공권 예약 정보 출력
-                        cout << "  (2) [항공권 예약 정보]는 아래와 같습니다.\n\n";
-                        if (fly_ver == 1)                       cout << "        ★ [Economy]등급으로 예약완료.\n";
-                        else if (fly_ver == 2)          cout << "        ★★ [Business]등급으로 예약완료.\n";
-                        else                                            cout << "        ★★★ [First]등급으로 예약완료.\n";
+                        printf("  (2) [항공권 예약 정보]는 아래와 같습니다.\n\n");
+                        if (fly_ver == 1)                       printf("        ★ [Economy]등급으로 예약완료.\n");
+                        else if (fly_ver == 2)          printf("        ★★ [Business]등급으로 예약완료.\n");
+                        else                                            printf("        ★★★ [First]등급으로 예약완료.\n");
 
-                        cout << "\n            [출발지]           [도착지]                [가격]\n";
-                        cout << "     ========================================================================\n";
+                        printf("\n            [출발지]           [도착지]                [가격]\n");
+                        printf("     ========================================================================\n");
 
                         for (int i = 0; i < num_dest; i++) {
                                 // 현재도시, 다음도시, 머무는날수, 항공편, 항공가격, 호텔예약을 저장
                                 temp = addNode(&ct_head, sorted_dest, period / num_dest, i, num_dest, fly_ver, adjMatrix);
-                                printf("          [%d. %s]도시   →   [%d. %s]도시        [ %d ] KRW(원)\n", temp->cur_city+1, cityStorage.getCityName(temp->cur_city).c_str(), temp->next_city+1, cityStorage.getCityName(temp->next_city).c_str(), temp->flight_cost);
+                                printf("          [ %d ]번 도시   →   [ %d ]번 도시        [ %d ] KRW(원)\n", temp->cur_city, temp->next_city, temp->flight_cost);
                                 total_price += temp->flight_cost;                               // 총 가격 누적
                         }
-                        cout << "     ========================================================================\n";
+                        printf("     ========================================================================\n");
                         // 여행기간 분배하기(남은일자 있으면 앞에서부터 하루씩 증가)
                         int rest_day = period % num_dest;
                         if (rest_day > 0) {
@@ -1677,16 +1426,16 @@ int main() {
 
 
                         // 링크드 리스트 출력
-                        cout << "\n  (3) 도시별 [날짜 분배]는 아래와 같이 진행합니다. \n\n";
+                        printf("\n  (3) 도시별 [날짜 분배]는 아래와 같이 진행합니다. \n\n");
                         printLinkedList(ct_head);
 
 
                         // 3-4. 호텔 예약하기 (도시별 여행기간을 보고)
                         // 예약자가 900명이상 : 에러
                         if (booked_num >= 900) {
-                                cout << "\n  [예약자 폭주] 죄송합니다. 예약 완료자가 900명이 넘어서 더이상 예약이 불가능합니다.\n  예약은 파기됩니다....\n\n";
-                                cout << "  아무 숫자나 누르면 [홈]으로 돌아갑니다.\n  아무 숫자 : ";
-                                int tmp;  cin >> tmp;
+                                printf("\n  [예약자 폭주] 죄송합니다. 예약 완료자가 900명이 넘어서 더이상 예약이 불가능합니다.\n  예약은 파기됩니다....\n\n");
+                                printf("  아무 숫자나 누르면 [홈]으로 돌아갑니다.\n  아무 숫자 : ");
+                                int tmp;  scanf("%d", &tmp);
                                 continue;
                         }
                         // 갈 도시들 둘러보면서
@@ -1700,19 +1449,19 @@ int main() {
                         }
                         // 호텔수가 부족하므로 예약 파기
                         if (!room_flag) {
-                                printf("\n  [호텔 부족] 죄송합니다. %d번 도시에 예약가능한 호텔이 충분치 않습니다.\n  다른 도시를 선택하거나 여행일자를 줄여주세요.\n  예약은 파기됩니다....\n\n", temp->cur_city+1);
-                                cout << "  아무 숫자나 누르면 [홈]으로 돌아갑니다.\n  아무 숫자 : ";
-                                int tmp;  cin >> tmp;
+                                printf("\n  [호텔 부족] 죄송합니다. %d번 도시에 예약가능한 호텔이 충분치 않습니다.\n  다른 도시를 선택하거나 여행일자를 줄여주세요.\n  예약은 파기됩니다....\n\n", temp->cur_city);
+                                printf("  아무 숫자나 누르면 [홈]으로 돌아갑니다.\n  아무 숫자 : ");
+                                int tmp;  scanf("%d", &tmp);
                                 continue;
                         }
 
                         // 호텔 예약 진행
-                        cout << "\n\n  (4) [호텔 예약 정보]는 아래와 같이 진행했습니다.\n\n";
-                        if (hotel_ver == 1)                             cout << "        ★ [Cheapest] 방식으로 호텔 예약 완료\n";
-                        else if (hotel_ver == 2)                cout << "        ★★[Resonable] 방식으로 호텔 예약 완료\n";
-                        else                                                    cout << "        ★★★ [Flex] 방식으로 호텔 예약 완료\n";
-                        cout << "\n            [일차]        [도시]                [호텔가격]\n";
-                        cout << "     ================================================================================\n";
+                        printf("\n\n  (4) [호텔 예약 정보]는 아래와 같이 진행했습니다.\n\n");
+                        if (hotel_ver == 1)                             printf("        ★ [Cheapest] 방식으로 호텔 예약 완료\n");
+                        else if (hotel_ver == 2)                printf("        ★★ [Resonable] 방식으로 호텔 예약 완료\n");
+                        else                                                    printf("        ★★★ [Flex] 방식으로 호텔 예약 완료\n");
+                        printf("\n            [일차]        [도시번호]               [호텔가격]\n");
+                        printf("     ================================================================================\n");
                         int hot_cnt = 1;
                         for (temp = ct_head; temp != NULL; temp = temp->next) {         // 방문할 도시 돌면서
                                 for (int i = 0; i < temp->stay; i++) {                                          // 묵을 날 수 돌면서
@@ -1730,14 +1479,14 @@ int main() {
                                                 RB_DELETE(HT[temp->cur_city], booking_hotel->key);
                                                 avail_room[temp->cur_city] -= 1;        // 예약가능한 호텔 수 1개 감소
                                                 temp->hotel[i] = booking_price;         // 묵을 호텔 가격(key) 기록
-                                                printf("         - %d일차  :  [%d. %s]도시 Hotel      [ %d ] KRW(원) 에 예약완료.\n", hot_cnt, temp->cur_city+1, cityStorage.getCityName(temp->cur_city).c_str(), booking_price);
+                                                printf("         - %d일차  :  [ %d ]번도시 Hotel      [ %d ] KRW(원) 에 예약완료.\n", hot_cnt, temp->cur_city, booking_price);
                                                 hot_cnt++;
                                                 total_price += booking_price;                   // 총 비용 누적
                                         }
                                 }
-                                cout << "\n\n";
+                                printf("\n\n");
                         }
-                        cout << "     ================================================================================\n";
+                        printf("     ================================================================================\n");
 
 
 
@@ -1780,8 +1529,8 @@ int main() {
                                         avail_room[temp->cur_city] += temp->stay;
                                 }
                                 printf("\n  [예산 부족] 죄송합니다. 예산보다 총 예상비용이 더 나오므로 예약이 불가능합니다.\n  예산 : %d (KRW)\n  예상 총비용 : %d (KRW)\n  예산을 늘려주시거나 호텔, 비행 옵션을 낮춰서 다시 예약해주세요.\n  예약은 파기됩니다....\n\n", budget, total_price);
-                                cout << "  아무 숫자나 누르면 [홈]으로 돌아갑니다.\n  아무 숫자 : ";
-                                int tmp;  cin >> tmp;
+                                printf("  아무 숫자나 누르면 [홈]으로 돌아갑니다.\n  아무 숫자 : ");
+                                int tmp;  scanf("%d", &tmp);
                                 continue;
                         }
 
@@ -1810,15 +1559,15 @@ int main() {
 
 
 
-                        cout << "\n ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";
+                        printf("\n ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n");
                         printf("\n\n  위와 같이 항공권과 호텔 예약이 완료되었습니다.\n\n  고객님의 예약번호는  (customer-id) : [ %d ] 입니다.\n\n  감사합니다. 아무 숫자를 입력하면 [홈]으로 돌아갑니다.\n  아무 숫자 : ", random_customer_id);
-                        int tmp;  cin >> tmp;
+                        int tmp;  scanf("%d", &tmp);
 
                 }// 1.새로운 예약 끝
                 else {
-                        cout << "\n\n  [명령어 오류] : 명령어를 잘못 입력하셨습니다. 다시 입력해주세요.\n\n";
-                        cout << "  아무 숫자나 누르면 [홈]으로 돌아갑니다.\n  아무 숫자 : ";
-                        int tmp;  cin >> tmp;
+                        printf("\n\n  [명령어 오류] : 명령어를 잘못 입력하셨습니다. 다시 입력해주세요.\n\n");
+                        printf("  아무 숫자나 누르면 [홈]으로 돌아갑니다.\n  아무 숫자 : ");
+                        int tmp;  scanf("%d", &tmp);
                 }
         }// 명령어 while문 끝
 
@@ -1826,11 +1575,11 @@ int main() {
         //--------------------------[마지막 단계] 메모리 해제하기 --------------------------------------------------//
         //--------------------------------------------------------------------------------------------------------//
         // 생성된 호텔루트들을 메모리에서 해제
-        cout << "\n  사용했던 '메모리를 해제중'입니다. 잠시만 기다려주세요....\n\n";
-        for (int i = 0; i < NODES; i++) {
+        printf("\n  사용했던 '메모리를 해제중'입니다. 잠시만 기다려주세요....\n\n");
+        for (int i = 0; i < 100; i++) {
                 free(HT[i]);
         }
-        cout << "\n  '종료'하겠습니다. 다시 이용해주세요. 감사합니다.\n";
+        printf("\n  '종료'하겠습니다. 다시 이용해주세요. 감사합니다.\n");
         freeAdjMatrix(adjMatrix);   // 인접행렬 메모리 해제
 
         return 0;

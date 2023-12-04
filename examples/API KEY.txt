@@ -1,0 +1,9 @@
+
+export OPENAI_API_KEY='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'
+
+cmake .. && make
+
+
+참고 자료
+https://platform.openai.com/docs/models/overview
+https://openai.com/pricing
